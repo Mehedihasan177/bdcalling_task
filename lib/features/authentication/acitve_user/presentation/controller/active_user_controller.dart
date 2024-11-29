@@ -22,21 +22,21 @@ class ActiveUserController extends GetxController {
   var isLoading = false.obs;
   final box = GetStorage();
 
-  activeUserFunction(BuildContext context) async {
+  activeUserFunction(BuildContext context, String code) async {
     try {
       ActiveUserPassUseCase loginUseCase =
       ActiveUserPassUseCase(locator<ActiveUserRepository>());
-      if (code.value.isEmpty) {
+      if (code.isEmpty) {
         errorToast(context: context, msg: "Please enter the active account code.");
       }  else {
         isLoading.value = true;
         update();
         var response = await loginUseCase(
             email: box.read("email"),
-            code: code.value);
+            code: code);
         print("this is data of active user ${response?.data?.status}");
         if (response?.data != null && response?.data?.status == "Success") {
-            // RouteGenerator.pushNamedAndRemoveAll(context, Routes.homepage);
+            RouteGenerator.pushNamedAndRemoveAll(context, Routes.homepage);
         } else {
           if (!context.mounted) return;
           if (response?.data?.status == null) {

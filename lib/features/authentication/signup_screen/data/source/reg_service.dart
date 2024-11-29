@@ -15,12 +15,14 @@ class RegService {
   Future<Response<RegistrationModel>?> regPass(dio.FormData data) async {
     Response<RegistrationModel>? apiResponse;
 
-    print("the reg data is ${data.fields}");
-    for (var fileEntry in data.files) {
-      print("Key: ${fileEntry.key}");
-      var file = fileEntry.value; // MultipartFile object
-      print("File name: ${file.filename}");
+    print("Request fields:");
+    for (var field in data.fields) {
+      print("Key: ${field.key}, Value: ${field.value}");
+    }
 
+    print("Request files:");
+    for (var file in data.files) {
+      print("Key: ${file.key}, File name: ${file.value.filename}, File length: ${file.value.length}");
     }
    await _dioClient.post(
       path: NetworkConfiguration.registration,

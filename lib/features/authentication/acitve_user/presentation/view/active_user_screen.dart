@@ -134,7 +134,7 @@ class _ActiveUserScreenState extends State<ActiveUserScreen> {
             const SizedBox(height: 30),
             CustomElevatedButton(text: "Verify", hexColor: AppColors.orange, onPress: (){
               controller.code.value = _controllers.map((controller) => controller.text).join();
-              controller.activeUserFunction(context);
+              controller.activeUserFunction(context, _controllers.map((controller) => controller.text).join());
             },)
             // ElevatedButton(
             //   onPressed: () {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dio/dio.dart' as dio;
@@ -16,7 +17,8 @@ import '../../../widget/custom_elevatedButton/custom_text.dart';
 import '../../data/model/profile_model.dart';
 import '../../domain/repository/profile_update_repository.dart';
 import '../../domain/usecase/profile_update_pass_usecase.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 class ProfileUpdateController extends GetxController {
   var obscureTextPassword = true.obs;
   var obscureTextConfirmPassword = true.obs;
@@ -62,45 +64,91 @@ class ProfileUpdateController extends GetxController {
     addressController.value.text = profileModel.value.data?.address ?? '';
     passwordController.value.text = profileModel.value.data?.password ?? '';
   }
-  submitProfileUpdate(BuildContext context) async {
+  Future<void> submitProfileUpdate(BuildContext context) async {
     try {
       isLoading.value = true;
-      ProfileUpdatePassUseCase profileUpdatePassUseCase =
-      ProfileUpdatePassUseCase(locator<ProfileUpdateRepository>());
-      final photoUrl = "${NetworkConfiguration.baseUrl}${box.read("photo")}";
 
-      final tempDir = await getTemporaryDirectory(); // Using path_provider package
+      // Initialize use case
+      final profileUpdatePassUseCase =
+      ProfileUpdatePassUseCase(locator<ProfileUpdateRepository>());
+
+      // Prepare file paths
+      final photoUrl = "${NetworkConfiguration.baseUrl}${box.read("photo")}";
+      final tempDir = await getTemporaryDirectory(); // Get temporary directory
       final tempFilePath = '${tempDir.path}/${profileModel.value.data?.image?.split('/').last}';
-      final response1 = await dio.Dio().download(photoUrl, tempFilePath);
-      dio.FormData formData = dio.FormData.fromMap({
+
+      // Download file if no image is picked
+      if (pickedImage.value.path.isEmpty) {
+        print("Downloading profile image...");
+        await dio.Dio().download(photoUrl, tempFilePath);
+      }
+
+      // Prepare FormData
+      final formData = dio.FormData.fromMap({
         "firstName": firstNameController.value.text,
         "lastName": lastNameController.value.text,
         "address": addressController.value.text,
         "password": passwordController.value.text,
-        // "file": pickedImage.value.path.isNotEmpty ? await dio.MultipartFile.fromFile(
-        //   pickedImage.value.path,
-        //   filename: pickedImage.value.path.split('/').last, // Get the file name
-        // ) : await dio.MultipartFile.fromFile(
-        //   tempFilePath,
-        //   filename: profileModel.value.data?.image?.split('/').last, // Get the file name
-        // ),
+        "file": await _prepareFile(
+          pickedImage.value.path,
+          tempFilePath,
+          profileModel.value.data?.image,
+        ),
       });
-      var response = await profileUpdatePassUseCase(formData);
-      if (response?.data != null) {
-        print("this is not here");
-        isClickable.value = true;
-        successToast(context: context, msg: response?.data?.message.toString() ?? '');
-        isLoading.value = false;
 
+      // Call API
+      final response = await profileUpdatePassUseCase(formData);
+
+      // Handle response
+      if (response?.data != null) {
+        print("Profile update successful.");
+        isClickable.value = true;
+        successToast(
+          context: context,
+          msg: response?.data?.message.toString() ?? 'Profile updated successfully!',
+        );
+      } else {
+        print("No data returned from the API.");
       }
-    } catch (e) {
-      isLoading.value = false;
-      print(e.toString());
+    } catch (e, stacktrace) {
+      // Log and handle errors
+      print("Error occurred during profile update: $e");
+      print("Stacktrace: $stacktrace");
     } finally {
+      // Stop loading indicator
       isLoading.value = false;
     }
   }
 
+  Future<dio.MultipartFile> _prepareFile(String pickedImagePath, String tempFilePath, String? serverImagePath) async {
+    String filePath;
+    String fileName;
+
+    if (pickedImagePath.isNotEmpty) {
+      // Use the picked image
+      filePath = pickedImagePath;
+      fileName = pickedImagePath.split('/').last;
+    } else {
+      // Use the temporary file path or server image
+      filePath = tempFilePath;
+      fileName = serverImagePath?.split('/').last ?? 'default.jpg';
+    }
+
+    // Ensure the file exists
+    if (!await File(filePath).exists()) {
+      throw Exception("File does not exist at path: $filePath");
+    }
+
+    // Use lookupMimeType to get the MIME type
+    final mimeType = lookupMimeType(filePath) ?? 'application/octet-stream';
+
+    // Create and return MultipartFile with contentType
+    return dio.MultipartFile.fromFile(
+      filePath,
+      filename: fileName,
+      contentType: MediaType.parse(mimeType), // Correct usage without prefix
+    );
+  }
   Future<void> pickImageCamera() async {
     // Request camera permission and storage permissions for Android 10 and below
     if (await Permission.camera.request().isGranted &&

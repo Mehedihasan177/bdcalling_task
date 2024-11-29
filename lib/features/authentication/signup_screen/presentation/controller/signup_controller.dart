@@ -13,7 +13,8 @@ import '../../../../get_all_task/presentation/ui/widgets/custom_toast.dart';
 import '../../../sign_in/presentation/controller/signin_controller.dart';
 import '../../domain/repository/reg_repository.dart';
 import '../../domain/usecase/reg_pass_usecase.dart';
-
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 class SignupController extends GetxController{
   var obscureTextPassword = true.obs;
   var obscureTextConfirmPassword = true.obs;
@@ -53,29 +54,27 @@ class SignupController extends GetxController{
         isLoading.value = true;
         RegPassUseCase signUpPassUseCase =
         RegPassUseCase(locator<RegRepository>());
-        var formData = dio.FormData.fromMap({
+        final filePath = pickedImage.value.path;
+
+        // Validate the file
+        if (filePath.isEmpty || !(await File(filePath).exists())) {
+          print("Error: File does not exist at path: $filePath");
+          return;
+        }
+
+        final formData = dio.FormData.fromMap({
           "firstName": firstNameController.value.text,
           "lastName": lastNameController.value.text,
           "email": emailController.value.text,
           "address": addressController.value.text,
           "password": passwordController.value.text,
           "file": await dio.MultipartFile.fromFile(
-            pickedImage.value.path,
-            filename: pickedImage.value.path.split('/').last, // Get the file name
+            filePath,
+            filename: filePath.split('/').last,
+            contentType: MediaType.parse(lookupMimeType(filePath) ?? 'application/octet-stream'),
           ),
         });
-        var data = {
-          "firstName": firstNameController.value.text,
-          "lastName": lastNameController.value.text,
-          "email": emailController.value.text,
-          "address": addressController.value.text,
-          "password": passwordController.value.text,
-          "password_confirmation": confirmPasswordController.value.text,
-          "file": await dio.MultipartFile.fromFile(
-            pickedImage.value.path,
-            filename: pickedImage.value.path.split('/').last, // Get the file name
-          ),
-        };
+
         forCheck(formData);
         var response = await signUpPassUseCase(formData);
         if (response?.data != null && response?.data?.status == "Success"){
