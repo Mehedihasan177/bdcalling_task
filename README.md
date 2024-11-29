@@ -1,4 +1,4 @@
-# todo_app_project
+# Task management
 
 A new Flutter project.
 
