@@ -8,9 +8,9 @@ class SignInRepositoryImpl extends SignInRepository {
 
   @override
   Future<Response<LoginModel?>?> loginWithIdPass(
-      {required String userName, required String password}) async {
+      {required String email, required String password}) async {
     Response<LoginModel>? apiResponse;
-    apiResponse = await loginService.loginWithIdPass(userName, password);
+    apiResponse = await loginService.loginWithIdPass(email, password);
     return apiResponse;
   }
 

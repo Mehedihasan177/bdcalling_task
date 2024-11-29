@@ -8,7 +8,7 @@ import '../../../../../../core/routes/router.dart';
 import '../../../../../../main.dart';
 import '../../../../../core/app_component/app_component.dart';
 import '../../../../../core/utils/consts/app_sizes.dart';
-import '../../../../todo_details/ui/widgets/custom_toast.dart';
+import '../../../../get_all_task/presentation/ui/widgets/custom_toast.dart';
 import '../../../../widget/custom_elevatedButton/custom_text.dart';
 import '../../data/model/login_model.dart';
 import '../../domain/repository/login_repository.dart';
@@ -46,9 +46,10 @@ class SigninController extends GetxController {
   }
 
   submitLoginData(BuildContext context, {required String from}) async {
+    var response;
     try {
-      LoginWithIdPassUseCase loginUseCase =
-          LoginWithIdPassUseCase(locator<SignInRepository>());
+      SignInPassUseCase loginUseCase =
+      SignInPassUseCase(locator<SignInRepository>());
       if (emailController.value.text.isEmpty && (box.read("email")?.isEmpty ?? false)) {
         errorToast(context: context, msg: "Please enter email");
       } else if (passwordController.value.text.isEmpty && (box.read("password")?.isEmpty ?? false)) {
@@ -56,8 +57,8 @@ class SigninController extends GetxController {
       } else {
         isLoading.value = true;
         update();
-        var response = await loginUseCase(
-            userName: box.read("email") ?? emailController.value.text,
+         response = await loginUseCase(
+            email: box.read("email") ?? emailController.value.text,
             password: box.read("password") ?? passwordController.value.text);
         print("this is data of login ${response?.data?.data?.user?.email}");
         if (response?.data != null) {
@@ -65,12 +66,7 @@ class SigninController extends GetxController {
           session.createSession(response?.data,
               phoneNumber: emailController.value.text,
               password: passwordController.value.text);
-
-          box.write("fullName", response?.data?.data?.user?.email);
-          box.write("amount", response?.data?.data?.user?.email);
-          if (from != "profile") {
             RouteGenerator.pushNamedAndRemoveAll(context, Routes.homepage);
-          }
           if (!context.mounted) return;
           if ((box.read("email").toString().isEmpty) &&
               (box.read("password").toString().isEmpty)) {
@@ -88,14 +84,14 @@ class SigninController extends GetxController {
       }
     } catch (e) {
       isLoading.value = false;
-      if(e.toString().contains("401")){
-        errorToast(context: context, msg: "Invalid login credential!");
+      if(e.toString().contains("404")){
+        errorToast(context: context, msg: "No user found. Please create an account");
+        box.erase();
+        RouteGenerator.pushNamedAndRemoveAll(context, Routes.signinPage);
       }else{
-        ErrorDialog(context,
-            msg:
-            "Server Error!, Don't be panic. Your all data will be safe.\nPlease contact with number:",
-            msg2: "01886372032");
+        errorToast(context: context, msg: "Something went wrong. Please try again");
       }
+
       print("response?.data?.status ${e.toString()}");
 
       print(e.toString() ?? '');
@@ -107,7 +103,7 @@ class SigninController extends GetxController {
   }
 
   void ErrorDialog(BuildContext context,
-      {required String msg, required String msg2}) {
+      {required String msg}) {
     showDialog(
       barrierDismissible: true,
       context: context,
@@ -133,18 +129,7 @@ class SigninController extends GetxController {
                   fontSize: AppSizes.size16,
                 ),
                 5.ph,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomSimpleText(
-                      text: msg2,
-                      color: Colors.black,
-                      fontSize: AppSizes.size16,
-                      alignment: TextAlign.center,
-                    ),
 
-                  ],
-                ),
               ],
             ),
           ),

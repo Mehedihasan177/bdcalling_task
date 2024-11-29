@@ -6,10 +6,10 @@ import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
 import 'package:todo_app_project/core/routes/router.dart';
 import 'package:todo_app_project/core/services/theme_services.dart';
-import 'package:todo_app_project/features/todo_details/ui/theme.dart';
 
 import 'core/app_component/app_component.dart';
 import 'core/source/session_manager.dart';
+import 'features/get_all_task/presentation/ui/theme.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final session = SessionManager();
 void main() async{
@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Todo',
+      title: 'Task Management',
       theme: Themes.light,
       darkTheme: Themes.dark,
       themeMode: _ts.theme,

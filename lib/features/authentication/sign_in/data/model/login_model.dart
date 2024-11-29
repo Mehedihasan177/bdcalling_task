@@ -1,6 +1,7 @@
 class LoginModel {
   String? status;
   String? message;
+  String? error;
   Data? data;
 
   LoginModel({this.status, this.message, this.data});
@@ -8,6 +9,7 @@ class LoginModel {
   LoginModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
+    error = json['error'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
@@ -15,6 +17,7 @@ class LoginModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['status'] = this.status;
     data['message'] = this.message;
+    data['error'] = this.error;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }

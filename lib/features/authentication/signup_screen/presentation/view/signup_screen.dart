@@ -38,7 +38,7 @@ class SignupScreen extends StatelessWidget {
                         child: Align(
                             alignment: Alignment.bottomLeft,
                             child: CustomSimpleText(
-                              text: "Video",
+                              text: "Task",
                               alignment: TextAlign.end,
                               fontSize: AppSizes.size40,
                               fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class SignupScreen extends StatelessWidget {
                       child: Align(
                           alignment: Alignment.bottomLeft,
                           child: CustomSimpleText(
-                            text: "E-commerce",
+                            text: "Management",
                             alignment: TextAlign.end,
                             fontSize: AppSizes.size27,
                             fontWeight: FontWeight.w600,
@@ -59,7 +59,7 @@ class SignupScreen extends StatelessWidget {
                     ),
                     40.ph,
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.76,
+                      height: MediaQuery.of(context).size.height ,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         color: AppColors.slightWhite,
@@ -113,7 +113,7 @@ class SignupScreen extends StatelessWidget {
                               SizedBox(
                                 height: 45,
                                 child: CustomTextfield(
-                                  controller: controller.firstName.value,
+                                  controller: controller.firstNameController.value,
                                   hintText: "Enter first name",
                                   lebelText: "First Name",
                                 ),
@@ -122,7 +122,7 @@ class SignupScreen extends StatelessWidget {
                               SizedBox(
                                 height: 45,
                                 child: CustomTextfield(
-                                  controller: controller.lastName.value,
+                                  controller: controller.lastNameController.value,
                                   hintText: "Enter last name",
                                   lebelText: "Last Name",
                                 ),
@@ -134,15 +134,6 @@ class SignupScreen extends StatelessWidget {
                                   controller: controller.emailController.value,
                                   hintText: "Enter your email",
                                   lebelText: "Email",
-                                ),
-                              ),
-                              20.ph,
-                              SizedBox(
-                                height: 45,
-                                child: CustomTextfield(
-                                  controller: controller.phoneNumber.value,
-                                  hintText: "Enter your phone number",
-                                  lebelText: "Phone Number",
                                 ),
                               ),
                               20.ph,
@@ -250,11 +241,7 @@ class SignupScreen extends StatelessWidget {
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.only(top: 20),
-                            child: Icon(
-                              Icons.person,
-                              size: 55,
-
-                            ),
+                            child: Center(child: Image.asset("images/logo.png", height: 52, width:  52,)),
                           ),
                         ),
                       )

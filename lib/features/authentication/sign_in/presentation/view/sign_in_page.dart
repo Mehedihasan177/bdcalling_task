@@ -35,7 +35,7 @@ class SignInPage extends StatelessWidget {
                         child: Align(
                             alignment: Alignment.bottomLeft,
                             child: CustomSimpleText(
-                              text: "Video",
+                              text: "Task",
                               alignment: TextAlign.end,
                               fontSize: AppSizes.size40,
                               fontWeight: FontWeight.w600,
@@ -48,7 +48,7 @@ class SignInPage extends StatelessWidget {
                       child: Align(
                           alignment: Alignment.bottomLeft,
                           child: CustomSimpleText(
-                            text: "E-commerce",
+                            text: "Management",
                             alignment: TextAlign.end,
                             fontSize: AppSizes.size27,
                             fontWeight: FontWeight.w600,
@@ -57,7 +57,7 @@ class SignInPage extends StatelessWidget {
                     ),
                     40.ph,
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.76,
+                      height: MediaQuery.of(context).size.height,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         color: AppColors.slightWhite,

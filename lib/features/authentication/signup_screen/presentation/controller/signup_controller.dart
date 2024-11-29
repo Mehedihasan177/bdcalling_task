@@ -7,7 +7,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:dio/dio.dart' as dio;
 import '../../../../../../main.dart';
 import '../../../../../core/app_component/app_component.dart';
-import '../../../../todo_details/ui/widgets/custom_toast.dart';
+import '../../../../../core/routes/route_name.dart';
+import '../../../../../core/routes/router.dart';
+import '../../../../get_all_task/presentation/ui/widgets/custom_toast.dart';
 import '../../../sign_in/presentation/controller/signin_controller.dart';
 import '../../domain/repository/reg_repository.dart';
 import '../../domain/usecase/reg_pass_usecase.dart';
@@ -16,9 +18,8 @@ class SignupController extends GetxController{
   var obscureTextPassword = true.obs;
   var obscureTextConfirmPassword = true.obs;
   var emailController = TextEditingController().obs;
-  var firstName = TextEditingController().obs;
-  var lastName = TextEditingController().obs;
-  var phoneNumber = TextEditingController().obs;
+  var firstNameController = TextEditingController().obs;
+  var lastNameController = TextEditingController().obs;
   var addressController = TextEditingController().obs;
   var confirmPasswordController = TextEditingController().obs;
   var passwordController = TextEditingController().obs;
@@ -32,14 +33,12 @@ class SignupController extends GetxController{
     super.onInit();
   }
   submitSignupData(BuildContext context) async {
-    if(firstName.value.text.isEmpty){
+    if(firstNameController.value.text.isEmpty){
       errorToast(context: context, msg: "Please enter first name");
-    }else if(lastName.value.text.isEmpty){
+    }else if(lastNameController.value.text.isEmpty){
       errorToast(context: context, msg: "Please enter last name");
     }else if(emailController.value.text.isEmpty){
       errorToast(context: context, msg: "Please  enter email");
-    }else if(phoneNumber.value.text.isEmpty){
-      errorToast(context: context, msg: "Please enter phone number");
     }else if(addressController.value.text.isEmpty){
       errorToast(context: context, msg: "Please enter address");
     }else if(passwordController.value.text.isEmpty){
@@ -49,37 +48,54 @@ class SignupController extends GetxController{
     } else if(pickedImage.value.path.isEmpty){
       errorToast(context: context, msg: "Please insert an image");
     }else{
+      print("pickedImage.value.path ${pickedImage.value.path}");
       try {
         isLoading.value = true;
         RegPassUseCase signUpPassUseCase =
         RegPassUseCase(locator<RegRepository>());
-        dio.FormData formData = dio.FormData.fromMap({
-          "name": "${firstName.value.text} ${lastName.value.text}",
+        var formData = dio.FormData.fromMap({
+          "firstName": firstNameController.value.text,
+          "lastName": lastNameController.value.text,
           "email": emailController.value.text,
-          "phone": phoneNumber.value.text,
           "address": addressController.value.text,
           "password": passwordController.value.text,
-          "password_confirmation": confirmPasswordController.value.text,
-          "photo": await dio.MultipartFile.fromFile(
+          "file": await dio.MultipartFile.fromFile(
             pickedImage.value.path,
             filename: pickedImage.value.path.split('/').last, // Get the file name
           ),
         });
+        var data = {
+          "firstName": firstNameController.value.text,
+          "lastName": lastNameController.value.text,
+          "email": emailController.value.text,
+          "address": addressController.value.text,
+          "password": passwordController.value.text,
+          "password_confirmation": confirmPasswordController.value.text,
+          "file": await dio.MultipartFile.fromFile(
+            pickedImage.value.path,
+            filename: pickedImage.value.path.split('/').last, // Get the file name
+          ),
+        };
         forCheck(formData);
         var response = await signUpPassUseCase(formData);
-        if (response?.data != null && response?.data?.message == "Registration Successfull!"){
+        if (response?.data != null && response?.data?.status == "Success"){
           print("this is not here");
-          successToast(context: context, msg: "Successfully sign up");
+          successToast(context: context, msg: response?.data?.message ?? '');
           box.write("token", response?.data);
           isLoading.value = false;
-          box.write("fullName", "${firstName.value.text} ${lastName.value.text}");
+          box.write("fullName", "${firstNameController.value.text} ${lastNameController.value.text}");
           box.write("email", emailController.value.text);
           box.write("password", passwordController.value.text);
-          signinController.submitLoginData(context, from: "reg");
+          RouteGenerator.pushNamed(context, Routes.activeUserPage);
+          // signinController.submitLoginData(context, from: "reg");
+        }else {
+          if (!context.mounted) return;
+          if (response?.data?.status == null) {
+            errorToast(context: context, msg: response?.data?.error ?? '');
+          }
         }
       } catch (e) {
         print(e.toString());
-        // errorToast(context: context, msg: e.toString());
       }finally{
         isLoading.value = false;
       }

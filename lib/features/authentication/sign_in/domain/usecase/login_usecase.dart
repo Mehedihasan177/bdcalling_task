@@ -1,8 +1,8 @@
 import '../repository/login_repository.dart';
 
-abstract class LoginUseCase {
+abstract class SignInUseCase {
   final SignInRepository loginRepository;
 
-  LoginUseCase(this.loginRepository);
+  SignInUseCase(this.loginRepository);
 }
 

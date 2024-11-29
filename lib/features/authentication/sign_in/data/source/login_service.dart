@@ -14,11 +14,11 @@ class SignInService {
 
 // To decode the response if needed
 
-  Future<Response<LoginModel>?> loginWithIdPass(String id, String password) async {
+  Future<Response<LoginModel>?> loginWithIdPass(String email, String password) async {
     Response<LoginModel>? apiResponse;
 
     var formData = {
-      "email": id,
+      "email": email,
       "password": password,
     };
     print("login credentials $formData");

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app_project/core/routes/route_name.dart';
+import 'package:todo_app_project/features/authentication/acitve_user/presentation/view/active_user_screen.dart';
 import 'package:todo_app_project/features/authentication/sign_in/presentation/view/sign_in_page.dart';
 import 'package:todo_app_project/features/authentication/signup_screen/presentation/view/signup_screen.dart';
-import 'package:todo_app_project/features/todo_details/ui/screens/home_screen.dart';
 import 'package:todo_app_project/features/splash_screen/presentation/splash_screen.dart';
+
+import '../../features/get_all_task/presentation/ui/screens/get_task_details_screen.dart';
+import '../../features/get_all_task/presentation/ui/screens/home_screen.dart';
+import '../../features/profile_update/presentation/view/profile_update_screen.dart';
 
 class RouteGenerator {
   static pushNamed(BuildContext context, String pageName) {
@@ -68,6 +72,18 @@ class RouteGenerator {
         case Routes.signupPage:
         return MaterialPageRoute(
           builder: (context) =>  SignupScreen(),
+        );
+        case Routes.activeUserPage:
+        return MaterialPageRoute(
+          builder: (context) =>  ActiveUserScreen(),
+        );
+        case Routes.getTaskDetails:
+        return MaterialPageRoute(
+          builder: (context) =>  GetTaskDetailsScreen(),
+        );
+        case Routes.profile:
+        return MaterialPageRoute(
+          builder: (context) =>  ProfileUpdateScreen(),
         );
      
       default:

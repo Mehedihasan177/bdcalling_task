@@ -1,16 +1,15 @@
 
 import '../../../../../../core/source/model/api_response.dart';
 import '../../data/model/login_model.dart';
-import '../../data/model/user_info_model.dart';
 import 'login_usecase.dart';
 
-class LoginWithIdPassUseCase extends LoginUseCase {
-  LoginWithIdPassUseCase(super.loginRepository);
+class SignInPassUseCase extends SignInUseCase {
+  SignInPassUseCase(super.loginRepository);
 
   Future<Response<LoginModel?>?> call(
-      {required String userName, required String password}) async {
+      {required String email, required String password}) async {
     var response = await loginRepository.loginWithIdPass(
-        userName: userName, password: password);
+        email: email, password: password);
     return response;
   }
 }

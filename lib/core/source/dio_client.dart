@@ -58,6 +58,50 @@ class DioClient {
     // }
     return response;
   }
+  Future<Response?> petch({
+    required String path,
+    dynamic request,
+    required Function(dynamic, String?) responseCallback,
+    required Function(String?, int?) failureCallback,
+    dynamic header,
+  }) async {
+    Response? response;
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    // try {
+      if (connectivityResult.contains(ConnectivityResult.mobile) ||
+          connectivityResult.contains(ConnectivityResult.wifi)) {
+        response = await dio.patch(
+          (NetworkConfiguration.baseUrl) + path,
+          data: request,
+          // queryParameters: request,
+          options: Options(
+            method: "PATCH",
+            headers: {
+              'Authorization': 'Bearer ${box.read("token")}',
+              'Content-Type': 'multipart/form-data',
+            },
+            receiveTimeout: const Duration(milliseconds: 30000),
+
+          ),
+        );
+    // var csrftoken = response.headers.remove('set-cookie').substring(10, 74);
+        if (response.data != null) {
+          logger.i("dio response $response");
+          logger.i("dio response111 ${response.data}");
+
+          responseCallback(response.data, response.statusMessage);
+        } else {
+          failureCallback(response.statusMessage, response.statusCode);
+        }
+      } else {
+        // CommonMethods.showToast(Constants.MESSAGE_NO_INTERNET, Colors.white);
+      }
+    // } catch (e) {
+    //   // logger.d(e.toString());
+    //   failureCallback("Something went wrong!", 400);
+    // }
+    return response;
+  }
 
   Future<Response?> postMultiplatFormData({
     required String path,
@@ -156,6 +200,48 @@ class DioClient {
       if (connectivityResult.contains(ConnectivityResult.mobile) ||
           connectivityResult.contains(ConnectivityResult.wifi)) {
         response = await dio.get(
+          NetworkConfiguration.baseUrl + path,
+          queryParameters: queryParameters,
+          options: Options(
+            headers: {
+              'Accept': '*',
+              'Authorization': 'Bearer ${box.read("token")}',
+            },
+            method: "GET",
+            receiveTimeout: const Duration(milliseconds: 3000),
+          ),
+        );
+        print("response.dataASDasdASDasds user ${box.read("token")} ${response.data}");
+        print("session token ${box.read("token")}");
+
+        if (response.data != null) {
+          logger.i("dio response $response");
+          responseCallback(response.data, response.statusMessage);
+        } else {
+          failureCallback(response.statusMessage, response.statusCode);
+        }
+      } else if (connectivityResult.contains(ConnectivityResult.none)) {
+        // failureCallback(noInternetConnectionMessage, 12029);
+      }
+    } on Exception catch (e, _) {
+      // failureCallback(tryAgainErrorMessage, 400);
+    }
+    return response;
+  }
+  Future<Response?> delete({
+    required String path,
+    required Function(dynamic, String?) responseCallback,
+    required Function(String?, int?) failureCallback,
+    Map<String, Object>? queryParameters,  bool? isNeedToken,
+  }) async {
+    Response? response;
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    print("the url is ${NetworkConfiguration.baseUrl + path}");
+    print("response.dataASDasdASDasds1 ${response} $queryParameters");
+    try {
+      if (connectivityResult.contains(ConnectivityResult.mobile) ||
+          connectivityResult.contains(ConnectivityResult.wifi)) {
+        response = await dio.delete(
           NetworkConfiguration.baseUrl + path,
           queryParameters: queryParameters,
           options: Options(

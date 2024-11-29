@@ -5,7 +5,7 @@ class AppColors {
   static final Color backgroundColor = HexColor('#072844');
   static final Color slightWhite = HexColor('#F9FBFF');
   static final Color slightBlue = HexColor('#4A789F');
-  static final Color orange = HexColor('#FF7840');
+  static final Color orange = HexColor('#eb5521');
   static final Color allProductCardColor = HexColor('#F5F5F5');
   static final Color white = HexColor('#FFFFFF');
   static final Color deepGrey = HexColor('#B4B4B4');
